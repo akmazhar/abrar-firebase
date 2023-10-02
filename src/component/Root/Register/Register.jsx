@@ -1,7 +1,7 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import auth from "../../../firebase/firebase.config";
-import { useState } from "react";
-
+import { useState } from "react"; 
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Register = () => {
     const [registerError, setRegisterError] = useState('');
@@ -14,7 +14,8 @@ const Register = () => {
         console.log("yes");
        const email = e.target.email.value;
        const password = e.target.password.value;
-       console.log(email, password);
+       const accepted = e.target.terms.checked;
+       console.log(email, password, accepted);
 
             //reset error
             setRegisterError('');
@@ -27,6 +28,11 @@ const Register = () => {
       }
       else if(!/[A-Z]/.test(password)){
         setRegisterError('Your password should have at least one upper case characters.');
+        return;
+      }
+
+      else if(!accepted){
+        setRegisterError('Please accept our terms and conditions!');
         return;
       }
   
@@ -60,18 +66,30 @@ const Register = () => {
     name="email"/>
 
     <br/>
-    <input  
-    className="bg-slate-100 w-3/4 py-2 px-4 mt-2" 
-    type="password" 
-    placeholder="Password" 
-    id="" required 
-    name="password" />
+     <div className="relative">
+        <input  
+          className="bg-slate-100 w-3/4 py-2 px-4 mt-2" 
+          type={showPassword ? "text" : "password"}
+          placeholder="Password" 
+          id="" required 
+          name="password" />
 
-    <span>Show</span>
+          <span className="absolute top-4 right-48" onClick={() => setShaowPassword(!showPassword)}>
+          {
+            showPassword ? <FaEye></FaEye> : <FaEyeSlash></FaEyeSlash>
+          }
+          </span>
     
+     </div>
+
     <br/>
 
-    <input  className="btn bg-green-900 text-white px-9 rounded-md mt-2" 
+    <input className="ml-40 mr-2 " type="checkbox" name="terms" id="terms"/>
+    <label className="textarea" htmlFor="terms">Accept our <a href="#">Terms and Condition</a></label>
+
+    <br/>
+
+    <input  className="btn bg-green-900 text-white px-9 rounded-md mt-2 w-3/4" 
     type="submit" value="Register" id=""/>
 
    </form>
