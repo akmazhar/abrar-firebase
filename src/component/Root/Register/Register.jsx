@@ -1,8 +1,9 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import auth from "../../../firebase/firebase.config";
 import { useState } from "react"; 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { Result } from "postcss";
 
 const Register = () => {
     const [registerError, setRegisterError] = useState('');
@@ -13,14 +14,23 @@ const Register = () => {
     const handleRegister = e => {
         e.preventDefault();
         console.log("yes");
+       const name = e.target.name.value;
        const email = e.target.email.value;
        const password = e.target.password.value;
        const accepted = e.target.terms.checked;
-       console.log(email, password, accepted);
+       console.log(name, email, password, accepted);
 
             //reset error
             setRegisterError('');
             setSuccess('');
+
+          //update profile 
+          updateProfile(Result.user, {
+            displayName: name,
+            photoURL: "https://i.ibb.co/QnqFLDG/j.png"
+          })
+          .then(()=> console.log('profile updated'))
+          .catch()
      
        
       if(password.length < 6) {
@@ -42,6 +52,13 @@ const Register = () => {
    .then(result => {
     console.log(result.user);
     setSuccess('User Created Successfully');
+
+    //send verification email
+    sendEmailVerification(result.user)
+    .then(()=>{
+      alert('Please check your email and verify your account')
+    })
+
    })
    .catch(error => {
     console.error(error);
@@ -61,6 +78,14 @@ const Register = () => {
     <form onSubmit={handleRegister}>
 
     <input className="bg-slate-100 w-3/4 py-2 px-4 mt-2"  
+    type="your name" 
+    placeholder="Your Name" 
+    id="" required 
+    name="name"/>
+
+
+
+    <input className="bg-slate-100 w-3/4 py-2 px-4 mt-2"  
     type="email" 
     placeholder="Email Address" 
     id="" required 
@@ -68,6 +93,8 @@ const Register = () => {
 
     <br/>
      <div className="relative">
+
+
         <input  
           className="bg-slate-100 w-3/4 py-2 px-4 mt-2" 
           type={showPassword ? "text" : "password"}
